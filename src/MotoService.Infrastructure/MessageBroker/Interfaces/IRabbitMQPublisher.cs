@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-using MotoService.Domain.Entities;
-using MotoService.Infrastructure.MessageBroker;
+﻿using MotoService.Domain.Entities;
 
 namespace MotoService.Infrastructure.MessageBroker.Interfaces
 {

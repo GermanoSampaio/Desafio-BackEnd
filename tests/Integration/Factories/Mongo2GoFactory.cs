@@ -5,7 +5,6 @@ using MongoDB.Driver;
 using Moq;
 using MotoService.Infrastructure.Persistence.Contexts;
 using MotoService.Infrastructure.Persistence.Settings;
-using System.Threading.Tasks;
 
 namespace MotoService.Tests.Integration.Factories
 {

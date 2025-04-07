@@ -3,11 +3,9 @@ using AutoMapper;
 using Microsoft.Extensions.Logging;
 using MotoService.Application.DTOs;
 using MotoService.Application.Interfaces;
-using MotoService.Application.Mappers;
 using MotoService.Domain.Entities;
 using MotoService.Domain.Exceptions;
 using MotoService.Domain.Interfaces;
-using MotoService.Infrastructure.Persistence;
 
 namespace MotoService.Application.Services
 {

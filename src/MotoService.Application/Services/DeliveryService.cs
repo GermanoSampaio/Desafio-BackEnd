@@ -1,9 +1,11 @@
 ﻿
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using MotoService.Application.DTOs;
 using MotoService.Application.Interfaces;
 using MotoService.Application.Mappers;
+using MotoService.Domain.Entities;
 using MotoService.Domain.Exceptions;
 using MotoService.Domain.Interfaces;
 using MotoService.Domain.Validators;
@@ -15,21 +17,23 @@ namespace MotoService.Application.Services
         private readonly IDeliveryRepository _repository;
         private readonly IFileStorageService _storage;
         private readonly ILogger<DeliveryService> _logger;
+        private readonly IMapper _mapper;
 
-        public DeliveryService(IDeliveryRepository repository, IFileStorageService storage, ILogger<DeliveryService> logger)
+        public DeliveryService(IDeliveryRepository repository, IFileStorageService storage, ILogger<DeliveryService> logger, IMapper mapper)
         {
             _repository = repository;
             _storage = storage;
             _logger = logger;
+            _mapper = mapper;
         }
 
         public async Task<DeliveryDTO> RegisterAsync(CreateDeliveryDTO deliveryDto)
         {
             await ValidateDelivery(deliveryDto);
-            var delivery = DeliveryMapper.ToEntity(deliveryDto);
+            var delivery = _mapper.Map<Delivery>(deliveryDto);
 
             await _repository.CreateAsync(delivery);
-            return DeliveryMapper.ToDTO(delivery);
+            return _mapper.Map<DeliveryDTO>(delivery);
         }
         public async Task<string> UploadCNHImageAsync(string identifier, IFormFile cnhFile)
         {
@@ -51,7 +55,8 @@ namespace MotoService.Application.Services
         public async Task<DeliveryDTO?> GetByIdAsync(string identifier)
         {
             var delivery = await _repository.GetByIdentifierAsync(identifier) ?? throw new DeliveryNotFoundException();
-            return DeliveryMapper.ToDTO(delivery);
+
+            return _mapper.Map<DeliveryDTO>(delivery);
         }
 
         private async Task ValidateDelivery(CreateDeliveryDTO dto)

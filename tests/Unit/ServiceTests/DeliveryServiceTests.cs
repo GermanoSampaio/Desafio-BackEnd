@@ -1,8 +1,10 @@
-﻿using FluentAssertions;
+﻿using AutoMapper;
+using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
 using MotoService.Application.DTOs;
+using MotoService.Application.Mappers;
 using MotoService.Application.Services;
 using MotoService.Domain.Entities;
 using MotoService.Domain.Enums;
@@ -18,17 +20,22 @@ namespace tests.Unit.DeliveryTests
         private readonly Mock<IFileStorageService> _fileStorageServiceMock;
         private readonly Mock<ILogger<DeliveryService>> _mockLogger;
         private readonly DeliveryService _deliveryService;
+        private readonly IMapper _mapper;
 
         public DeliveryServiceTests()
         {
             _deliveryRepositoryMock = new Mock<IDeliveryRepository>();
             _fileStorageServiceMock = new Mock<IFileStorageService>();
             _mockLogger = new Mock<ILogger<DeliveryService>>();
+            var config = new MapperConfiguration(cfg => cfg.AddProfile<DeliveryProfile>());
+            _mapper = config.CreateMapper();
 
             _deliveryService = new DeliveryService(
                 _deliveryRepositoryMock.Object,
                 _fileStorageServiceMock.Object,
-                _mockLogger.Object
+                _mockLogger.Object,
+                _mapper
+
             );
         }
 

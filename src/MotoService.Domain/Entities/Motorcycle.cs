@@ -1,10 +1,7 @@
 ﻿using System.Text.RegularExpressions;
-using System.Xml.Linq;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using MotoService.Domain.Enums;
 using MotoService.Domain.Exceptions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MotoService.Domain.Entities
 {

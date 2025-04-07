@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using MotoService.Domain.Entities;
 using MotoService.Domain.Repositories;
 using MotoService.Infrastructure.Persistence.Contexts;

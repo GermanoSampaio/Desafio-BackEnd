@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MotoService.Domain.Interfaces;
+﻿using MotoService.Domain.Interfaces;
 
 namespace MotoService.Tests.Integration.Mocks
 {

@@ -8,7 +8,6 @@ namespace MotoService.Infrastructure.Persistence
 {
     public class MotorcycleRepository : IMotorcycleRepository
     {
-        private readonly IMongoClient _mongoClient;
         private readonly IMongoCollection<Motorcycle> _motorcycles;
         private readonly ILogger<MotorcycleRepository> _logger;
         private readonly ISequenceGenerator _sequenceGenerator;
@@ -18,7 +17,6 @@ namespace MotoService.Infrastructure.Persistence
             _logger = logger;
             _motorcycles = context.Motorcycles;
             _sequenceGenerator = sequenceGenerator;
-            _mongoClient = context.Client;
 
             var indexKeys = Builders<Motorcycle>.IndexKeys.Ascending(m => m.LicensePlate);
             var indexOptions = new CreateIndexOptions { Unique = true };

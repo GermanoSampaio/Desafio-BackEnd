@@ -1,18 +1,10 @@
-﻿using System;
-using System.Threading.Tasks;
-using FluentAssertions;
-using Microsoft.Extensions.Configuration;
+﻿using FluentAssertions;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Mongo2Go;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using Moq;
-using MotoService.Domain.Entities;
 using MotoService.Domain.Interfaces;
 using MotoService.Infrastructure.Persistence;
-using MotoService.Infrastructure.Persistence.Contexts;
-using MotoService.Infrastructure.Persistence.Settings;
 using MotoService.Tests.Integration.Factories;
 using Xunit;
 

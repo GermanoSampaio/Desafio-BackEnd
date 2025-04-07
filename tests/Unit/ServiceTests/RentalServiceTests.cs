@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -78,7 +76,7 @@ namespace tests.Unit.ServiceTests
 
             var rental = new Rental("delivery001", "moto001", createDto.StartDate, createDto.TerminalDate)
             {
-                Identifier = "fed39c68d391480597bbab886669f0d4" // Exemplo de identificador gerado automaticamente
+                Identifier = "fed39c68d391480597bbab886669f0d4" 
             };
 
             _mockRentalRepository.Setup(x => x.CreateRentalAsync(It.IsAny<Rental>()))

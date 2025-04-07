@@ -4,9 +4,7 @@ using MotoService.Domain.Entities;
 using MotoService.Domain.Interfaces;
 using MotoService.Domain.Repositories;
 using MotoService.Domain.Services;
-using MotoService.Infrastructure.MessageBroker;
 using MotoService.Infrastructure.Persistence.Contexts;
-using MotoService.Infrastructure.Persistence.Services;
 
 namespace MotoService.Infrastructure.Persistence
 {

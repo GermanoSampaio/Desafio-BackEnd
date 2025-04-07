@@ -2,11 +2,9 @@
 using Microsoft.Extensions.Logging;
 using MotoService.Application.DTOs;
 using MotoService.Application.Interfaces;
-using MotoService.Application.Mappers;
 using MotoService.Domain.Entities;
 using MotoService.Domain.Exceptions;
 using MotoService.Domain.Repositories;
-using MotoService.Infrastructure.MessageBroker;
 using MotoService.Infrastructure.MessageBroker.Interfaces;
 
 namespace MotoService.Application.Services

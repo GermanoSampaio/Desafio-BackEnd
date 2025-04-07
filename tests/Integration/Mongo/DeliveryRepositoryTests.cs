@@ -1,7 +1,5 @@
 ﻿using FluentAssertions;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Mongo2Go;
 using MongoDB.Driver;
 using Moq;
@@ -10,8 +8,6 @@ using MotoService.Domain.Enums;
 using MotoService.Domain.Interfaces;
 using MotoService.Domain.Repositories;
 using MotoService.Infrastructure.Persistence;
-using MotoService.Infrastructure.Persistence.Contexts;
-using MotoService.Infrastructure.Persistence.Settings;
 using MotoService.Tests.Integration.Factories;
 
 namespace tests.Integration.Mongo
@@ -51,10 +47,10 @@ namespace tests.Integration.Mongo
             // Arrange
             var delivery = new Delivery("João", "91.393.713/0001-18", new DateTime(1990, 5, 4), "73594488006", CnhType.A);
 
-            // Act - Chama o método de criação real
+            // Act 
             await _repository.CreateAsync(delivery);
 
-            // Assert - Verifica se o delivery foi inserido no banco
+            // Assert
             var result = await _repository.GetByIdentifierAsync(delivery.Identifier);
             result.Should().NotBeNull();
             result!.Name.Should().Be("João");
@@ -66,10 +62,10 @@ namespace tests.Integration.Mongo
         {
             var delivery = new Delivery("Maria", "11.945.466/0001-86", new DateTime(1990, 5, 4), "84825309187", CnhType.A);
 
-            // Act - Cria o delivery no banco
+            // Act
             await _repository.CreateAsync(delivery);
 
-            // Act - Verifica se o CNPJ existe
+            // Act
             var exists = await _repository.ExistsByCNPJAsync(delivery.Cnpj);
 
             // Assert
@@ -81,10 +77,10 @@ namespace tests.Integration.Mongo
         {
             var delivery = new Delivery("Carlos", "25.867.328/0001-30", new DateTime(1990, 5, 4), "53262624680", CnhType.A);
 
-            // Act - Cria o delivery no banco
+            // Act
             await _repository.CreateAsync(delivery);
 
-            // Act - Verifica se a CNH existe
+            // Act
             var exists = await _repository.ExistsByCNHAsync(delivery.CnhNumber);
 
             // Assert
