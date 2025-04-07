@@ -1,0 +1,76 @@
+# Build results
+bin/
+obj/
+out/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# VS Code
+.vscode/
+
+# Rider
+.idea/
+
+# Visual Studio
+.vs/
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Node (caso use Node para frontend integrado)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Logs
+*.log
+
+# Secrets
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+
+# Publish output
+publish/
+*.db
+
+# Docker
+**/*.dockerfile
+docker-compose.override.yml
+.env
+.env.*
+
+# Test artifacts
+TestResults/
+*.coverage
+*.coveragexml
+*.testsettings
+*.trx
+
+# Global JetBrains Rider ignore
+.idea/
+
+# Mac OS
+.DS_Store
+
+# Mongo2Go data (caso esteja usando nos testes)
+Mongo2Go/
+
+# Others
+*.nupkg
+*.snupkg
+*.sdf
+*.sql
