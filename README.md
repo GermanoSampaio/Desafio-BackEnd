@@ -1,4 +1,4 @@
-# Desafio backend Mottu.
+# Desafio backend.
 Seja muito bem-vindo ao desafio backend da Mottu, obrigado pelo interesse em fazer parte do nosso time e ajudar a melhorar a vida de milhares de pessoas.
 
 ## Instruções
