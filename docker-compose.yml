@@ -1,0 +1,64 @@
+
+services:
+  # MongoDB com Replica Set
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb-rs
+    ports:
+      - 27017:27017
+    command: ["--replSet", "rs0", "--bind_ip_all"]
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - backend
+
+  # RabbitMQ com UI de gerenciamento
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - 5672:5672        # Porta para apps .NET
+      - 15672:15672      # Interface web
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - backend
+
+  # MinIO (S3-compatible storage)
+  minio:
+    image: minio/minio
+    container_name: minio
+    command: server /data --console-address ":9001"
+    ports:
+      - 9000:9000        # API S3
+      - 9001:9001        # Console Web
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio-data:/data
+    networks:
+      - backend
+  
+  api:
+    container_name: motoservice-api
+    build:
+      context: ./src
+      dockerfile: MotoService.API/Dockerfile
+    ports:
+      - 8080:8080
+    depends_on:
+      - mongodb
+      - rabbitmq
+      - minio
+    networks:
+      - backend
+      
+volumes:
+  mongo-data:
+  minio-data:
+
+networks:
+  backend:
+    driver: bridge

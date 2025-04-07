@@ -1,0 +1,24 @@
+{
+  "MongoSettings": {
+    "ConnectionString": "mongodb://localhost:27017",
+    "DatabaseName": "MotoService_Test"
+  },
+  "RabbitMQSettings": {
+    "HostName": "localhost",
+    "QueueName": "test-queue",
+    "UserName": "guest",
+    "Password": "guest"
+  },
+  "StorageSettings": {
+    "BucketName": "test-bucket",
+    "AccessKey": "test-access-key",
+    "SecretKey": "test-secret-key",
+    "ServiceUrl": "http://localhost:9000"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Debug",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  }
+}
