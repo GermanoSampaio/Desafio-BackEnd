@@ -22,18 +22,19 @@ namespace MotoService.API.Controllers
 
         [HttpPost("{id}/cnh")]
         [RequestSizeLimit(5_000_000)]
+        [Consumes("multipart/form-data")]
         [SwaggerOperation(Summary = "Upload da imagem da CNH de um entregador")]
         [SwaggerResponse(StatusCodes.Status200OK, "Upload realizado com sucesso")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Erro de validação")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Erro interno do servidor")]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> UploadCNHAsync(string id, [FromForm] IFormFile cnhFile)
+        public async Task<IActionResult> UploadCNHAsync(string id, [FromForm] CnhDTO request)
         {
-            if (cnhFile is null || cnhFile.Length == 0)
+            if (request?.CNHFile is null || request.CNHFile.Length == 0)
                 return BadRequest(new ErrorDto("Arquivo da CNH é obrigatório."));
+
             try
             {
-                var imageUrl = await _deliveryService.UploadCNHImageAsync(id, cnhFile);
+                var imageUrl = await _deliveryService.UploadCNHImageAsync(id, request.CNHFile);
                 return Ok(new UploadResultDTO(imageUrl));
             }
             catch (InvalidFileFormatException ex)
@@ -47,6 +48,7 @@ namespace MotoService.API.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Erro interno do servidor.");
             }
         }
+
 
         [HttpGet("{id}", Name = "GetByIdAsync")]
         public async Task<IActionResult> GetByIdAsync(string id)
