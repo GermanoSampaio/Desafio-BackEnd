@@ -3,16 +3,15 @@ using System.Text.Json.Serialization;
 
 namespace MotoService.Application.DTOs
 {
-    public class RentalDTO
+    public class RentalRequestDTO
     {
-        [JsonPropertyName("identificador")]
-        [Required(ErrorMessage = "O identificador é obrigatório.")]
-        public string Identifier { get; set; } = String.Empty;
         [JsonPropertyName("entregador_id")]
         [Required(ErrorMessage = "O campo entregador_id é obrigatório.")]
+        [RegularExpression("^entregador[0-9]{4}$", ErrorMessage = "O identificador deve estar no formato 'entregador0000'.")]
         public string DeliveryId { get; set; } = String.Empty;
         [JsonPropertyName("moto_id")]
         [Required(ErrorMessage = "O campo moto_id é obrigatório.")]
+        [RegularExpression("^[0-9]{4}$")]
         public string MotorcycleId { get; set; } = String.Empty;
         [JsonPropertyName("data_inicio")]
         [Required(ErrorMessage = "O data_inicio é obrigatório.")]
@@ -26,9 +25,5 @@ namespace MotoService.Application.DTOs
         [JsonPropertyName("plano")]
         [Required(ErrorMessage = "O plano é obrigatório.")]
         public int RentalPlan { get; set; }
-        [JsonPropertyName("valor_diaria")]
-        [Required(ErrorMessage = "O campo valor_diaria é obrigatório.")]
-        public double DailyRate { get; set; }
-
     }
 }

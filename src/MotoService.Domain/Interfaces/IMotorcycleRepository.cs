@@ -6,7 +6,7 @@ namespace MotoService.Domain.Repositories
     {
         Task<Motorcycle?> GetByIdAsync(string id);
         Task<List<Motorcycle>> GetAllAsync();
-        Task<string> CreateAsync(Motorcycle motorcycle);
+        Task<bool> CreateAsync(Motorcycle motorcycle);
         Task UpdateAsync(Motorcycle motorcycle);
         Task DeleteAsync(string id);
     }

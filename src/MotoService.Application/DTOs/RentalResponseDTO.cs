@@ -1,10 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using MotoService.Domain.Exceptions;
 
 namespace MotoService.Application.DTOs
 {
-    public class CreateRentalDTO
+    public class RentalResponseDTO
     {
+        [JsonPropertyName("identificador")]
+        [Required(ErrorMessage = "O identificador é obrigatório.")]
+        public string Identifier { get; set; } = String.Empty;
         [JsonPropertyName("entregador_id")]
         [Required(ErrorMessage = "O campo entregador_id é obrigatório.")]
         public string DeliveryId { get; set; } = String.Empty;
@@ -23,5 +27,9 @@ namespace MotoService.Application.DTOs
         [JsonPropertyName("plano")]
         [Required(ErrorMessage = "O plano é obrigatório.")]
         public int RentalPlan { get; set; }
+        [JsonPropertyName("valor_diaria")]
+        [Required(ErrorMessage = "O campo valor_diaria é obrigatório.")]
+        public double DailyRate { get; set; }
+
     }
 }

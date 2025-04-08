@@ -23,5 +23,16 @@
     {
         public RentalNotFoundException() : base(ErrorMessages.RentalNotFound) { }
     }
-    
+
+    public class MotorcycleUnavailableException : DomainException
+    {
+        public MotorcycleUnavailableException(string motorcycleId)
+            : base($"Moto {motorcycleId} está indisponível para o período informado.") { }
+    }
+    public class RentalStartDateInvalidException : DomainException
+    {
+        public RentalStartDateInvalidException()
+             : base(ErrorMessages.RentalStartDateInvalid) { }
+    }
+        
 }

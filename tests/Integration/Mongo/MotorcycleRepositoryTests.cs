@@ -24,12 +24,7 @@ namespace MotoService.Tests.Integration.Mongo
 
             var loggerMock = new Mock<ILogger<MotorcycleRepository>>();
 
-            var sequenceGeneratorMock = new Mock<ISequenceGenerator>();
-            sequenceGeneratorMock
-                .Setup(s => s.GetNextSequenceValueAsync("moto"))
-                .ReturnsAsync(1);
-
-            _repository = new MotorcycleRepository(mongoDbContext, loggerMock.Object, sequenceGeneratorMock.Object);
+            _repository = new MotorcycleRepository(mongoDbContext, loggerMock.Object);
         }
 
         public Task DisposeAsync()
@@ -43,7 +38,7 @@ namespace MotoService.Tests.Integration.Mongo
         public async Task GetAllAsync_ShouldReturnAllMotorcycles()
         {
             // Arrange
-            var motorcycle = new Motorcycle(2025, "Model X", "ABC-1234");
+            var motorcycle = new Motorcycle("moto000001", 2025, "Model X", "ABC-1234");
             await _repository.CreateAsync(motorcycle);
 
             // Act
@@ -58,11 +53,11 @@ namespace MotoService.Tests.Integration.Mongo
         public async Task GetByIdAsync_ShouldReturnMotorcycle_WhenExists()
         {
             // Arrange
-            var motorcycle = new Motorcycle(2025, "Model X", "ABC-1234") { Identifier = "moto000001" };
+            var motorcycle = new Motorcycle("moto000001", 2025, "Model X", "ABC-1234") { Identifier = "moto000001" };
             await _repository.CreateAsync(motorcycle);
 
             // Act
-            var result = await _repository.GetByIdAsync("moto000001");
+            var result = await _repository.GetByIdAsync(motorcycle.Identifier);
 
             // Assert
             result.Should().BeEquivalentTo(motorcycle, options => options.Excluding(m => m.Id));
@@ -82,14 +77,14 @@ namespace MotoService.Tests.Integration.Mongo
         public async Task CreateAsync_ShouldInsertMotorcycle()
         {
             // Arrange
-            var motorcycle = new Motorcycle(2025, "Model X", "ABC-1234");
+            var motorcycle = new Motorcycle("moto000001", 2025, "Model X", "ABC-1234");
 
             // Act
             var result = await _repository.CreateAsync(motorcycle);
 
             // Assert
-            result.Should().Be("moto000001");
-            var createdMotorcycle = await _repository.GetByIdAsync(result);
+            result.Should().Be(true);
+            var createdMotorcycle = await _repository.GetByIdAsync(motorcycle.Identifier);
             createdMotorcycle.Should().BeEquivalentTo(motorcycle, options => options.Excluding(m => m.Id));
         }
 
@@ -97,12 +92,12 @@ namespace MotoService.Tests.Integration.Mongo
         public async Task UpdateAsync_ShouldModifyMotorcycle()
         {
             // Arrange
-            var motorcycle = new Motorcycle(2025, "Model X", "ABC-1234") { Identifier = "moto000001" };
+            var motorcycle = new Motorcycle("moto000001",2025, "Model X", "ABC-1234");
             await _repository.CreateAsync(motorcycle);
             
             // Act
             await _repository.UpdateAsync(motorcycle);
-            var updatedMotorcycle = await _repository.GetByIdAsync("moto000001");
+            var updatedMotorcycle = await _repository.GetByIdAsync(motorcycle.Identifier);
 
             // Assert
             updatedMotorcycle.Should().BeEquivalentTo(motorcycle, options => options.Excluding(m => m.Id));
@@ -112,7 +107,7 @@ namespace MotoService.Tests.Integration.Mongo
         public async Task DeleteAsync_ShouldRemoveMotorcycle()
         {
             // Arrange
-            var motorcycle = new Motorcycle(2025, "Model X", "ABC-1234") { Identifier = "moto000001" };
+            var motorcycle = new Motorcycle("moto000001", 2025, "Model X", "ABC-1234");
             await _repository.CreateAsync(motorcycle);
 
             // Act

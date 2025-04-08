@@ -24,12 +24,12 @@ namespace MotoService.Domain.Entities
         [BsonElement("licensePlate")]
         public string LicensePlate { get; private set; } = string.Empty;
 
-        public Motorcycle(int year, string model, string licensePlate)
+        public Motorcycle(string identifier, int year, string model, string licensePlate)
         {
             SetModel(model);
             SetYear(year);
             SetLicensePlate(licensePlate);
-            Identifier = Guid.NewGuid().ToString("N");
+            Identifier = identifier;
         }
         public void SetModel(string model)
         {

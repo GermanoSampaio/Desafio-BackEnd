@@ -25,12 +25,7 @@ namespace tests.Integration.Mongo
 
             var loggerMock = new Mock<ILogger<DeliveryRepository>>();
 
-            var sequenceGeneratorMock = new Mock<ISequenceGenerator>();
-            sequenceGeneratorMock
-                .Setup(s => s.GetNextSequenceValueAsync("delivery"))
-                .ReturnsAsync(1);
-
-            _repository = new DeliveryRepository(loggerMock.Object, mongoDbContext, sequenceGeneratorMock.Object);
+            _repository = new DeliveryRepository(loggerMock.Object, mongoDbContext);
             await _repository.EnsureIndexesAsync(); 
         }
 
@@ -45,7 +40,7 @@ namespace tests.Integration.Mongo
         public async Task CreateAsync_ShouldInsertDelivery()
         {
             // Arrange
-            var delivery = new Delivery("João", "91.393.713/0001-18", new DateTime(1990, 5, 4), "73594488006", CnhType.A);
+            var delivery = new Delivery("entregador123", "João", "91.393.713/0001-18", new DateOnly(1990, 5, 4), "73594488006", "A", "base64String");
 
             // Act 
             await _repository.CreateAsync(delivery);
@@ -60,7 +55,7 @@ namespace tests.Integration.Mongo
         [Fact]
         public async Task ExistsByCNPJAsync_ShouldReturnTrue_WhenCNPJExists()
         {
-            var delivery = new Delivery("Maria", "11.945.466/0001-86", new DateTime(1990, 5, 4), "84825309187", CnhType.A);
+            var delivery = new Delivery("entregador555", "Maria", "11.945.466/0001-86", new DateOnly(1990, 5, 4), "84825309187", "A", "base64String");
 
             // Act
             await _repository.CreateAsync(delivery);
@@ -75,7 +70,7 @@ namespace tests.Integration.Mongo
         [Fact]
         public async Task ExistsByCNHAsync_ShouldReturnTrue_WhenCNHExists()
         {
-            var delivery = new Delivery("Carlos", "25.867.328/0001-30", new DateTime(1990, 5, 4), "53262624680", CnhType.A);
+            var delivery = new Delivery("entregador598", "Carlos", "25.867.328/0001-30", new DateOnly(1990, 5, 4), "53262624680", "A", "base64String");
 
             // Act
             await _repository.CreateAsync(delivery);
@@ -90,7 +85,7 @@ namespace tests.Integration.Mongo
         [Fact]
         public async Task UpdateCNHImageUrlAsync_ShouldUpdateImageUrl()
         {
-            var delivery = new Delivery("Ana", "82.236.017/0001-07", new DateTime(1990, 5, 4), "59440509314", CnhType.A);
+            var delivery = new Delivery("entregador599","Ana", "82.236.017/0001-07", new DateOnly(1990, 5, 4), "59440509314", "A", "base64String");
             await _repository.CreateAsync(delivery);
 
             delivery.SetCnhImageUrl("https://bucket/cnh/image.jpg");

@@ -37,8 +37,8 @@ namespace MotoService.Tests.Unit.ServiceTests
             // Arrange
             var motorcycles = new List<Motorcycle>
             {
-                new Motorcycle(2020, "Model1", "ABC-1234") { Identifier = "moto001" },
-                new Motorcycle(2021, "Model2", "DEF-5678") { Identifier = "moto002" }
+                new Motorcycle("moto001", 2020, "Model1", "ABC-1234"),
+                new Motorcycle("moto002", 2021, "Model2", "DEF-5678")
             };
 
             _mockMotorcycleRepository.Setup(x => x.GetAllAsync()).ReturnsAsync(motorcycles);
@@ -55,7 +55,7 @@ namespace MotoService.Tests.Unit.ServiceTests
         public async Task GetByIdAsync_ShouldReturnMotorcycle_WhenExists()
         {
             // Arrange
-            var motorcycle = new Motorcycle(2020, "Model1", "ABC-1234") { Identifier = "moto001" };
+            var motorcycle = new Motorcycle("moto001", 2020, "Model1", "ABC-1234");
 
             _mockMotorcycleRepository.Setup(x => x.GetByIdAsync("moto001")).ReturnsAsync(motorcycle);
 
@@ -84,7 +84,7 @@ namespace MotoService.Tests.Unit.ServiceTests
         public async Task UpdateLicensePlateAsync_ShouldUpdateLicensePlate_WhenValid()
         {
             // Arrange
-            var motorcycle = new Motorcycle(2020, "Model1", "ABC-1234") { Identifier = "moto001" };
+            var motorcycle = new Motorcycle("moto001", 2020, "Model1", "ABC-1234");
 
             _mockMotorcycleRepository.Setup(x => x.GetByIdAsync("moto001")).ReturnsAsync(motorcycle);
 
@@ -123,19 +123,17 @@ namespace MotoService.Tests.Unit.ServiceTests
         public async Task CreateAsync_ShouldReturnIdentifier_WhenValid()
         {
             // Arrange
-            var createDto = new CreateMotorcycleDTO
+            var createDto = new MotorcycleRequestDTO
             {
+                Identifier = "moto001",
                 Model = "Model1",
                 Year = 2020,
                 LicensePlate = "ABC-1234"
             };
 
-            var motorcycle = new Motorcycle(2020, "Model1", "ABC-1234")
-            {
-                Identifier = "moto001"
-            };
+            var motorcycle = new Motorcycle("moto001",2020, "Model1", "ABC-1234");
 
-            _mockMotorcycleRepository.Setup(x => x.CreateAsync(It.IsAny<Motorcycle>())).ReturnsAsync("moto001");
+            _mockMotorcycleRepository.Setup(x => x.CreateAsync(It.IsAny<Motorcycle>())).ReturnsAsync(true);
 
             // Act
             var result = await _motorcycleService.CreateAsync(createDto);

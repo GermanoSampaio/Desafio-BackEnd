@@ -23,5 +23,6 @@ namespace MotoService.Domain.Exceptions
         public const string InvalidRentalPeriod = "A data de devolução não pode ser anterior à data de início da locação.";
         public const string InvalidExpectedTerminalDate = "Data prevista de término não pode ser anterior à data de início.";
         public const string InvalidDailyRate = "Valor da diária deve ser maior que zero.";
+        public const string RentalStartDateInvalid = "A data de início da locação deve ser posterior à data atual.";
     }
 }

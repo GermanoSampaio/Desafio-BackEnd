@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNetCoreRateLimit" Version="5.0.0" />
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.0-preview.12" />
     <PackageReference Include="AWSSDK.S3" Version="4.0.0-preview.12" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />

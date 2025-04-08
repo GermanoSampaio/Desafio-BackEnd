@@ -35,7 +35,6 @@ namespace tests.Unit.DeliveryTests
                 _fileStorageServiceMock.Object,
                 _mockLogger.Object,
                 _mapper
-
             );
         }
 
@@ -43,13 +42,17 @@ namespace tests.Unit.DeliveryTests
         public async Task RegisterAsync_ShouldCreateDelivery_WhenDataIsValid()
         {
             // Arrange
-            var request = new CreateDeliveryDTO
+            var base64Image = Convert.ToBase64String(new byte[] { 0x89, 0x50, 0x4E, 0x47 });
+
+            var request = new DeliveryRequestDTO
             {
+                Identifier = "delivery001",
                 Name = "João da Silva",
                 CnhNumber = "12345678900",
-                CnhType = CnhType.A,
+                CnhType = "A",
                 Cnpj = "12345678000199",
-                BirthDate = DateTime.Now.AddYears(-25)
+                BirthDate = new DateOnly(2000, 5, 4),
+                CNHFileString = base64Image
             };
 
             _deliveryRepositoryMock.Setup(r => r.ExistsByCNHAsync(request.CnhNumber)).ReturnsAsync(false);
@@ -68,13 +71,15 @@ namespace tests.Unit.DeliveryTests
         [Fact]
         public async Task RegisterAsync_ShouldThrow_WhenCNHAlreadyExists()
         {
-            var request = new CreateDeliveryDTO
+            var request = new DeliveryRequestDTO
             {
+                Identifier = "delivery001",
                 Name = "João",
                 CnhNumber = "98183228257",
-                CnhType = CnhType.A,
+                CnhType = "A",
                 Cnpj = "53.421.554/0001-29",
-                BirthDate = DateTime.Now.AddYears(-25)
+                BirthDate = new DateOnly(2000, 5, 4),
+                CNHFileString = "base64string"
             };
 
             _deliveryRepositoryMock.Setup(r => r.ExistsByCNHAsync(request.CnhNumber)).ReturnsAsync(true);
@@ -88,13 +93,15 @@ namespace tests.Unit.DeliveryTests
         [Fact]
         public async Task RegisterAsync_ShouldThrow_WhenCNPJAlreadyExists()
         {
-            var request = new CreateDeliveryDTO
+            var request = new DeliveryRequestDTO
             {
+                Identifier = "delivery001",
                 Name = "João",
                 CnhNumber = "41591811988",
-                CnhType = CnhType.A,
+                CnhType = "A",
                 Cnpj = "61.662.853/0001-83",
-                BirthDate = DateTime.Now.AddYears(-25)
+                BirthDate = new DateOnly(2000, 5, 4),
+                CNHFileString = "base64string"
             };
 
             _deliveryRepositoryMock.Setup(r => r.ExistsByCNHAsync(request.CnhNumber)).ReturnsAsync(false);
@@ -109,8 +116,7 @@ namespace tests.Unit.DeliveryTests
         [Fact]
         public async Task GetByIdAsync_ShouldReturnDeliveryDTO_WhenDeliveryExists()
         {
-            var delivery = new Delivery("Ana", "11.945.466/0001-86", new DateTime(1990, 5, 4), "84825309187", CnhType.A);
-            delivery.SetIdentifier("delivery001");
+            var delivery = new Delivery("delivery001", "Ana", "11.945.466/0001-86", new DateOnly(1990, 5, 4), "84825309187", "A", "base64string");
 
             _deliveryRepositoryMock.Setup(r => r.GetByIdentifierAsync("delivery001")).ReturnsAsync(delivery);
 
@@ -136,25 +142,13 @@ namespace tests.Unit.DeliveryTests
         public async Task UploadCNHImageAsync_ShouldStoreImageAndUpdateUrl_WhenDeliveryExists()
         {
             // Arrange
-            var delivery = new Delivery("Paulo", "11.945.466/0001-86", new DateTime(1990, 5, 4), "84825309187", CnhType.A);
-            delivery.SetIdentifier("delivery123");
+            var identifier = "delivery123";
+            var base64Image = Convert.ToBase64String(new byte[] { 0x89, 0x50, 0x4E, 0x47 }); 
+            var delivery = new Delivery(identifier, "Paulo", "11.945.466/0001-86", new DateOnly(1990, 5, 4), "84825309187", "A", base64Image);
 
-            var fileMock = new Mock<IFormFile>();
-            var fileName = "cnh.png";
-            var stream = new MemoryStream();
-            var writer = new StreamWriter(stream);
-            writer.Write("test file");
-            writer.Flush();
-            stream.Position = 0;
+            var uploadedUrl = $"https://bucket/cnh/{identifier}_cnh.png";
 
-            fileMock.Setup(f => f.FileName).Returns(fileName);
-            fileMock.Setup(f => f.OpenReadStream()).Returns(stream);
-            fileMock.Setup(f => f.Length).Returns(stream.Length);
-            fileMock.Setup(f => f.ContentType).Returns("image/png");
-
-            var uploadedUrl = $"https://bucket/cnh/{fileName}";
-
-            _deliveryRepositoryMock.Setup(r => r.GetByIdentifierAsync(delivery.Identifier))
+            _deliveryRepositoryMock.Setup(r => r.GetByIdentifierAsync(identifier))
                 .ReturnsAsync(delivery);
 
             _fileStorageServiceMock.Setup(s => s.UploadAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<string>()))
@@ -164,7 +158,7 @@ namespace tests.Unit.DeliveryTests
                 .Returns(Task.CompletedTask);
 
             // Act
-            var result = await _deliveryService.UploadCNHImageAsync(delivery.Identifier, fileMock.Object);
+            var result = await _deliveryService.UploadCNHImageAsync(identifier, base64Image);
 
             // Assert
             result.Should().Be(uploadedUrl);
@@ -174,12 +168,13 @@ namespace tests.Unit.DeliveryTests
         [Fact]
         public async Task UploadCNHImageAsync_ShouldThrow_WhenDeliveryDoesNotExist()
         {
-            _deliveryRepositoryMock.Setup(r => r.GetByIdentifierAsync("delivery123"))
+            var identifier = "delivery123";
+            var base64Image = Convert.ToBase64String(new byte[] { 0x89, 0x50, 0x4E, 0x47 });
+
+            _deliveryRepositoryMock.Setup(r => r.GetByIdentifierAsync(identifier))
                 .ReturnsAsync((Delivery?)null);
 
-            var fileMock = new Mock<IFormFile>();
-
-            var act = async () => await _deliveryService.UploadCNHImageAsync("delivery123", fileMock.Object);
+            var act = async () => await _deliveryService.UploadCNHImageAsync(identifier, base64Image);
 
             await act.Should().ThrowAsync<DeliveryNotFoundException>()
                 .WithMessage("Entregador não encontrado.");

@@ -24,16 +24,16 @@ namespace MotoService.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<MotorcycleDTO>> GetAllAsync()
+        public async Task<IEnumerable<MotorcycleResponseDTO>> GetAllAsync()
         {
             var motorcycles = await _motorcycleRepository.GetAllAsync();
-            return motorcycles.Select(m => _mapper.Map<MotorcycleDTO>(m));
+            return motorcycles.Select(m => _mapper.Map<MotorcycleResponseDTO>(m));
         }
 
-        public async Task<MotorcycleDTO?> GetByIdAsync(string identifier)
+        public async Task<MotorcycleResponseDTO?> GetByIdAsync(string identifier)
         {
             var motorcycle = await _motorcycleRepository.GetByIdAsync(identifier) ?? throw new MotorcycleNotFoundException();
-            return _mapper.Map<MotorcycleDTO>(motorcycle);
+            return _mapper.Map<MotorcycleResponseDTO>(motorcycle);
         }
 
         public async Task<bool> UpdateLicensePlateAsync(string id, string newPlate)
@@ -50,12 +50,12 @@ namespace MotoService.Application.Services
             await _motorcycleRepository.DeleteAsync(identifier);
         }
 
-        public async Task<string> CreateAsync(CreateMotorcycleDTO motorcycleDto)
+        public async Task<string> CreateAsync(MotorcycleRequestDTO motorcycleDto)
         {
             var motorcycle = _mapper.Map<Motorcycle>(motorcycleDto);
             var created = await _motorcycleRepository.CreateAsync(motorcycle);
 
-            if (!String.IsNullOrEmpty(created))
+            if (created)
             {
                 var registeredEvent = new MotorcycleRegisteredEvent
                 {
@@ -75,7 +75,7 @@ namespace MotoService.Application.Services
                 _logger.LogError("Erro ao tentar cadastrar motocicleta.");
             }
 
-            return created;
+            return motorcycle.Identifier;
         }
     }
 }

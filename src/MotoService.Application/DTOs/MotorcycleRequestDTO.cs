@@ -3,10 +3,14 @@ using System.Text.Json.Serialization;
 
 namespace MotoService.Application.DTOs
 {
-    public class CreateMotorcycleDTO
+    public class MotorcycleRequestDTO
     {
         [JsonIgnore]
         public string Id { get; set; } = String.Empty;
+        [JsonPropertyName("identificador")]
+        [Required(ErrorMessage = "O identificador é obrigatório")]
+        [RegularExpression("^[0-9]{4}$")]
+        public string Identifier { get; set; } = String.Empty;
         [JsonPropertyName("ano")]
         [Required(ErrorMessage = "O ano é obrigatório.")]
         [Range(1900, 2100, ErrorMessage = "O ano deve estar entre 1900 e 2100.")]

@@ -35,7 +35,8 @@ namespace MotoService.Domain.Entities
         [BsonElement("daily_rate")]
         public double DailyRate { get; private set; }
 
-        public Rental(string deliveryId, string motorcycleId, DateTime startDate, DateTime terminalDate)
+        protected Rental() { }
+        public Rental(string identifier, string deliveryId, string motorcycleId, DateTime startDate, DateTime terminalDate)
         {
             if (string.IsNullOrWhiteSpace(deliveryId))
                 throw new DomainException(ErrorMessages.DeliveryIdRequired);
@@ -47,6 +48,11 @@ namespace MotoService.Domain.Entities
             MotorcycleId = motorcycleId;
             StartDate = startDate;
             TerminalDate = terminalDate;
+            Identifier = identifier;
+        }
+        public void SetIdentifier(string identifier)
+        {
+            Identifier = identifier;
         }
 
         public void SetTerminalDate(DateTime terminalDate)

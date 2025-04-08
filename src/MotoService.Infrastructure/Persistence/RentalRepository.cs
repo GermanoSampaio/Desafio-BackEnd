@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Data;
+using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using MotoService.Domain.Entities;
+using MotoService.Domain.Exceptions;
 using MotoService.Domain.Interfaces;
 using MotoService.Domain.Repositories;
 using MotoService.Domain.Services;
@@ -39,29 +41,14 @@ namespace MotoService.Infrastructure.Persistence
         {
             try
             {
-                long next = await _sequenceGenerator.GetNextSequenceValueAsync("rentals");
-                rental.Identifier = $"rental{next:D6}";
+                var next = await _sequenceGenerator.GetNextSequenceValueAsync("rentals");
+                rental.SetIdentifier($"locacao{next}");
 
-                var rentalDays = (rental.TerminalDate - rental.StartDate).Days;
-                var plan = await _rentalPlanRepository.GetByDaysAsync(rentalDays);
+                var configuredRental = await ConfigureRentalPlanAsync(rental);
 
-                if (plan is null)
-                {
-                    _logger.LogWarning("Plano de locação não encontrado para {rentalDays} dias.", rentalDays);
-                    return null;
-                }
+                await _rentalCollection.InsertOneAsync(configuredRental);
 
-                double totalPrice = RentalPriceCalculator.CalculateTotal(rental, plan);
-
-                rental.SetRentalPlan(plan);
-
-                rental.SetRentalPlan(plan);
-                rental.SetExpectedTerminalDate(rental.StartDate.AddDays(plan.Days));
-                rental.SetDailyRate(totalPrice);
-
-                await _rentalCollection.InsertOneAsync(rental);
-
-                _logger.LogInformation("Locação criada com sucesso: {Identifier}", rental.Identifier);
+                _logger.LogInformation("Locação criada com sucesso: {Identifier}", configuredRental.Identifier);
 
                 return rental;
             }
@@ -77,8 +64,12 @@ namespace MotoService.Infrastructure.Persistence
             }
         }
 
-        public async Task UpdateRentalAsync(Rental rental)
+        public async Task UpdateRentalAsync(Rental rental, DateTime newTerminalDate)
         {
+            var totalRental =  RentalPriceCalculator.CalculateTotal(rental, newTerminalDate);
+            rental.SetTerminalDate(newTerminalDate);
+            rental.SetDailyRate(totalRental);
+
             var filter = Builders<Rental>.Filter.Eq(r => r.Identifier, rental.Identifier);
             var result = await _rentalCollection.ReplaceOneAsync(filter, rental);
 
@@ -86,6 +77,31 @@ namespace MotoService.Infrastructure.Persistence
                 _logger.LogWarning("Nenhuma locação atualizada para o ID {Identifier}.", rental.Identifier);
             else
                 _logger.LogInformation("Locação atualizada com sucesso: {Identifier}", rental.Identifier);
+        }
+
+        private async Task<Rental?> ConfigureRentalPlanAsync(Rental rental)
+        {
+            var rentalDays = (rental.TerminalDate - rental.StartDate).Days;
+            var plan = await _rentalPlanRepository.GetByDaysAsync(rentalDays);
+
+            if (plan is null)
+            {
+                _logger.LogWarning("Plano de locação não encontrado para {rentalDays} dias.", rentalDays);
+                throw new RentalPlanNotFoundException(); 
+            }
+
+            rental.SetRentalPlan(plan);
+            rental.SetDailyRate(plan.DailyRate);
+            rental.SetExpectedTerminalDate(rental.StartDate.AddDays(plan.Days));
+
+            return rental;
+        }
+
+        public async Task<List<Rental>> GetRentalsByMotoIdAsync(string motorcycleId)
+        {
+            return await _rentalCollection
+                .Find(r => r.MotorcycleId == motorcycleId)
+                .ToListAsync();
         }
 
     }

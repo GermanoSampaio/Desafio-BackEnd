@@ -2,7 +2,7 @@
 
 namespace MotoService.Application.DTOs
 {
-    public class TerminalDateDTO
+    public class TerminalDateRequestDTO
     {
         [JsonPropertyName("data_devolucao")]
         public DateTime TerminalDate { get; set; }

@@ -8,9 +8,9 @@ namespace MotoService.Application.Mappers
     {
         public MotorcycleProfile()
         {
-            CreateMap<CreateMotorcycleDTO, Motorcycle>()
-                .ConstructUsing(dto => new Motorcycle(dto.Year, dto.Model, dto.LicensePlate));
-            CreateMap<Motorcycle, MotorcycleDTO>();
+            CreateMap<MotorcycleRequestDTO, Motorcycle>()
+                .ConstructUsing(dto => new Motorcycle(dto.Identifier, dto.Year, dto.Model, dto.LicensePlate));
+            CreateMap<Motorcycle, MotorcycleResponseDTO>();
         }
     }
 }

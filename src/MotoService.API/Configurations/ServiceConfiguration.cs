@@ -13,6 +13,8 @@ using MotoService.Infrastructure.Persistence.Services;
 using Amazon.S3;
 using MotoService.Infrastructure.AWS;
 using MotoService.Infrastructure.MessageBroker.Interfaces;
+using MotoService.Infrastructure.AWS.Settings;
+using MotoService.Domain.Services;
 
 namespace MotoService.API.Configurations
 {
@@ -50,6 +52,8 @@ namespace MotoService.API.Configurations
             services.AddScoped<IDeliveryService, DeliveryService>();
             services.AddScoped<IFileStorageService, FileStorageService>();
             services.AddScoped<IDeliveryRepository, DeliveryRepository>();
+            services.AddScoped<IRentalDomainService, RentalDomainService>();
+
 
             // RabbitMQ
             services.AddScoped<RabbitMQConsumer>();
@@ -57,7 +61,19 @@ namespace MotoService.API.Configurations
             services.AddHostedService<RabbitMQListenerService>();
 
             //AWS
-            services.AddAWSService<IAmazonS3>();
+            services.AddSingleton<IAmazonS3>(sp =>
+            {
+                var settings = sp.GetRequiredService<IOptions<AWSSettings>>().Value;
+                var config = new AmazonS3Config
+                {
+                    ServiceURL = settings.ServiceURL,
+                    ForcePathStyle = settings.ForcePathStyle,
+                    UseHttp = settings.UseHttp
+                };
+
+                return new AmazonS3Client(settings.AccessKey, settings.SecretKey, config);
+            });
+
         }
     }
 }

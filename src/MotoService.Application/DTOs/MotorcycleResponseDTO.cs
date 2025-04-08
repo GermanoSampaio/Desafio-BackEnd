@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace MotoService.Application.DTOs
 {
-    public class MotorcycleDTO
+    public class MotorcycleResponseDTO
     {
         [JsonIgnore]
         public string Id { get; set; } = String.Empty;

@@ -25,8 +25,8 @@ namespace tests.Integration.Mongo
         (_mongoRunner, _client, _session, var mongoDbContext) = await MongoDbContextFactory.CreateAsync();
 
             var loggerMock = new Mock<ILogger<RentalRepository>>();
-            var sequenceGeneratorMock = new Mock<ISequenceGenerator>();
-            sequenceGeneratorMock.Setup(s => s.GetNextSequenceValueAsync("rental")).ReturnsAsync(1);
+             var sequenceGeneratorMock = new Mock<ISequenceGenerator>();
+            sequenceGeneratorMock.Setup(s => s.GetNextSequenceValueAsync("rentals")).ReturnsAsync("locacao123");
 
             var rentalPlanRepositoryMock = new Mock<IRentalPlanRepository>();
             rentalPlanRepositoryMock.Setup(r => r.GetByDaysAsync(It.IsAny<int>())).ReturnsAsync(new RentalPlan(3, 75) { Id = ObjectId.GenerateNewId().ToString() });
@@ -45,7 +45,7 @@ namespace tests.Integration.Mongo
         public async Task InsertAsync_ShouldPersistRental()
         {
             // Arrange
-            var rental = new Rental("deliv001", "moto001", DateTime.Today, DateTime.Today.AddDays(3));
+            var rental = new Rental("entregador2637", "deliv001", "moto001", DateTime.Today, DateTime.Today.AddDays(7));
             rental.SetExpectedTerminalDate(DateTime.Today.AddDays(3));
             rental.SetDailyRate(75);
             rental.SetRentalPlan(new RentalPlan(3, 75));
@@ -63,7 +63,7 @@ namespace tests.Integration.Mongo
         public async Task GetByIdAsync_ShouldReturnRental_WhenRentalExists()
         {
             // Arrange
-            var rental = new Rental("deliv002", "moto002", DateTime.Today, DateTime.Today.AddDays(5));
+            var rental = new Rental("entregador2637", "deliv002", "moto002", DateTime.Today, DateTime.Today.AddDays(5));
             rental.SetExpectedTerminalDate(DateTime.Today.AddDays(5));
             rental.SetDailyRate(80);
             rental.SetRentalPlan(new RentalPlan(5, 80));
@@ -92,7 +92,7 @@ namespace tests.Integration.Mongo
         public async Task UpdateAsync_ShouldModifyRental()
         {
             // Arrange
-            var rental = new Rental("deliv003", "moto003", DateTime.Today, DateTime.Today.AddDays(7));
+            var rental = new Rental("entregador2637", "deliv003", "moto003", DateTime.Today, DateTime.Today.AddDays(7));
             rental.SetExpectedTerminalDate(DateTime.Today.AddDays(7));
             rental.SetDailyRate(90);
             rental.SetRentalPlan(new RentalPlan(7, 90) { Id = ObjectId.GenerateNewId().ToString() });
@@ -100,9 +100,10 @@ namespace tests.Integration.Mongo
             await _repository.CreateRentalAsync(rental);
 
             rental.SetDailyRate(100);
+            var newTerminalDate = DateTime.Today.AddDays(10); 
 
             // Act
-            await _repository.UpdateRentalAsync(rental);
+            await _repository.UpdateRentalAsync(rental, newTerminalDate); 
             var result = await _repository.GetRentalByIdAsync(rental.Identifier);
 
             // Assert

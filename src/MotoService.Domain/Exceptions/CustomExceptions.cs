@@ -13,7 +13,7 @@
 
     public class InvalidCnhTypeException : DomainException
     {
-        public InvalidCnhTypeException(char? type = null)
+        public InvalidCnhTypeException(string? type = null)
        : base($"{ErrorMessages.InvalidCnhType} Tipo informado: {type}") { }
     }
 

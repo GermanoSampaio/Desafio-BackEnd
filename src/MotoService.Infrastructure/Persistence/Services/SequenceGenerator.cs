@@ -13,7 +13,7 @@ namespace MotoService.Infrastructure.Persistence.Services
             _database = database;
         }
 
-        public async Task<long> GetNextSequenceValueAsync(string collectionName)
+        public async Task<string> GetNextSequenceValueAsync(string collectionName)
         {
             var counters = _database.GetCollection<BsonDocument>("counters");
 
@@ -28,7 +28,9 @@ namespace MotoService.Infrastructure.Persistence.Services
 
             var result = await counters.FindOneAndUpdateAsync(filter, update, options);
 
-            return result["sequence_value"].AsInt64;
+            var value = result["sequence_value"].AsInt32;
+
+            return value.ToString("D3");
         }
     }
 }

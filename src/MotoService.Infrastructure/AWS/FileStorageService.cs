@@ -40,21 +40,36 @@ namespace MotoService.Infrastructure.AWS
                     });
         }
 
-        public async Task<string> UploadAsync(Stream stream, string fileName, string contentType)
+        public async Task<string> UploadAsync(Stream originalStream, string fileName, string contentType)
         {
             var key = $"cnh/{fileName}";
+
+            var streamBytes = await GetBytesAsync(originalStream); 
             var request = new PutObjectRequest
             {
                 BucketName = _settings.BucketName,
                 Key = key,
-                InputStream = stream,
                 ContentType = contentType,
                 CannedACL = S3CannedACL.PublicRead
             };
 
-            await _retryPolicy.ExecuteAsync(() => _s3Client.PutObjectAsync(request));
+            await _retryPolicy.ExecuteAsync(() =>
+            {
+                var retryStream = new MemoryStream(streamBytes);
+                request.InputStream = retryStream;
+
+                return _s3Client.PutObjectAsync(request);
+            });
 
             return $"{_settings.EndpointUrl}/{_settings.BucketName}/{key}";
+        }
+
+        private static async Task<byte[]> GetBytesAsync(Stream stream)
+        {
+            using var memory = new MemoryStream();
+            stream.Position = 0; 
+            await stream.CopyToAsync(memory);
+            return memory.ToArray();
         }
     }
 }

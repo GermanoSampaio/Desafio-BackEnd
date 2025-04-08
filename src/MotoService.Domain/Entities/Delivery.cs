@@ -21,20 +21,25 @@ namespace MotoService.Domain.Entities
         public string Cnpj { get; private set; }
 
         [BsonElement("birth_date")]
-        public DateTime BirthDate { get; private set; }
+        public DateOnly BirthDate { get; private set; }
 
         [BsonElement("cnh_number")]
         public string CnhNumber { get; private set; }
 
         [BsonElement("cnh_type")]
-        public CnhType CnhType { get; private set; }
+        public string CnhType { get; private set; }
+
+        [BsonElement("cnh_base_64_string")]
+        public string CnhBase64String { get; private set; } = string.Empty;
 
         [BsonElement("cnh_image_path")]
         public string CnhImageURL { get; private set; } = string.Empty;
 
-        // Construtor com validações
-        public Delivery(string name, string cnpj, DateTime birthDate, string cnhNumber, CnhType cnhType)
+        public Delivery(string identifier, string name, string cnpj, DateOnly birthDate, string cnhNumber, string cnhType, string cnhBase64String)
         {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Identificador é obrigatório.", nameof(name));
+
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Nome é obrigatório.", nameof(name));
 
@@ -44,31 +49,33 @@ namespace MotoService.Domain.Entities
             if (!IsValidCnpj(cnpj))
                 throw new ArgumentException("CNPJ inválido.", nameof(cnpj));
 
-            if (birthDate > DateTime.UtcNow)
+            if (birthDate > DateOnly.FromDateTime(DateTime.UtcNow))
                 throw new ArgumentException("Data de nascimento não pode ser futura.", nameof(birthDate));
 
             if (string.IsNullOrWhiteSpace(cnhNumber))
                 throw new ArgumentException("Número da CNH é obrigatório.", nameof(cnhNumber));
 
-            if (!Enum.IsDefined(typeof(CnhType), cnhType))
+            if(string.IsNullOrWhiteSpace(cnhType))
                 throw new ArgumentException("Tipo de CNH inválido.", nameof(cnhType));
+
 
             Name = name;
             Cnpj = cnpj;
             BirthDate = birthDate;
             CnhNumber = cnhNumber;
             CnhType = cnhType;
-
-            Identifier = Guid.NewGuid().ToString("N");
-        }
-        public void SetIdentifier(string identifier)
-        {
             Identifier = identifier;
+            CnhBase64String = cnhBase64String;
         }
 
         public void SetCnhImageUrl(string url)
         {
             CnhImageURL = url;
+        }
+
+        public void SetCnhBase64String(string base64String)
+        {
+            CnhBase64String = base64String;
         }
 
         private bool IsValidCnpj(string cnpj)

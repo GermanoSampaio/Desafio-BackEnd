@@ -19,5 +19,14 @@ namespace MotoService.Infrastructure.Persistence
         {
             return await _collection.Find(p => p.Days == days).FirstOrDefaultAsync();
         }
+        public async Task<IEnumerable<RentalPlan>> GetAllAsync()
+        {
+            return await _collection.Find(_ => true).ToListAsync();
+        }
+
+        public async Task CreateAsync(RentalPlan rentalPlan)
+        {
+            await _collection.InsertOneAsync(rentalPlan);
+        }
     }
 }

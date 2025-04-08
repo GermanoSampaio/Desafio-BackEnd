@@ -8,6 +8,7 @@ namespace MotoService.API.Controllers
 {
     [ApiController]
     [Route("api/entregador")]
+    [Tags("entregadores")]
     public class DeliveryController : ControllerBase
     {
         private readonly IDeliveryService _deliveryService;
@@ -21,13 +22,8 @@ namespace MotoService.API.Controllers
         }
 
         [HttpPost("{id}/cnh")]
-        [RequestSizeLimit(5_000_000)]
-        [Consumes("multipart/form-data")]
-        [SwaggerOperation(Summary = "Upload da imagem da CNH de um entregador")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Upload realizado com sucesso")]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, "Erro de validação")]
-        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Erro interno do servidor")]
-        public async Task<IActionResult> UploadCNHAsync(string id, [FromForm] CnhDTO request)
+        [SwaggerOperation(Summary = "Enviar foto da CNH")]
+        public async Task<IActionResult> UploadCNHAsync(string id, [FromBody] CnhRequestDTO request)
         {
             if (request?.CNHFile is null || request.CNHFile.Length == 0)
                 return BadRequest(new ErrorDto("Arquivo da CNH é obrigatório."));
@@ -35,7 +31,7 @@ namespace MotoService.API.Controllers
             try
             {
                 var imageUrl = await _deliveryService.UploadCNHImageAsync(id, request.CNHFile);
-                return Ok(new UploadResultDTO(imageUrl));
+                return CreatedAtRoute(nameof(GetByIdAsync), new { id = id }, null);
             }
             catch (InvalidFileFormatException ex)
             {
@@ -49,8 +45,9 @@ namespace MotoService.API.Controllers
             }
         }
 
-
+        [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet("{id}", Name = "GetByIdAsync")]
+
         public async Task<IActionResult> GetByIdAsync(string id)
         {
             try
@@ -65,8 +62,10 @@ namespace MotoService.API.Controllers
             }
         }
 
+        [SwaggerOperation(Summary = "Cadastrar entregador")]
+
         [HttpPost]
-        public async Task<IActionResult> CreateAsync([FromBody] CreateDeliveryDTO delivery)
+        public async Task<IActionResult> CreateAsync([FromBody] DeliveryRequestDTO delivery)
         {
 
             if (!ModelState.IsValid)
@@ -80,7 +79,8 @@ namespace MotoService.API.Controllers
             }
 
             var result = await _deliveryService.RegisterAsync(delivery);
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = result.Identifier }, result);
+
+            return CreatedAtRoute(nameof(GetByIdAsync), new { id = result.Identifier }, null);
         }
     }
 }

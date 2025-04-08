@@ -8,15 +8,17 @@ namespace MotoService.Application.Mappers
     {
         public DeliveryProfile()
         {
-            CreateMap<CreateDeliveryDTO, Delivery>()
+            CreateMap<DeliveryRequestDTO, Delivery>()
                 .ConstructUsing(dto => new Delivery(
+                    dto.Identifier,
                     dto.Name,
                     dto.Cnpj,
                     dto.BirthDate,
                     dto.CnhNumber,
-                    dto.CnhType
+                    dto.CnhType,
+                    dto.CNHFileString
                 ));
-            CreateMap<Delivery, DeliveryDTO>();
+            CreateMap<Delivery, DeliveryResponseDTO>();
         }
     }
 }

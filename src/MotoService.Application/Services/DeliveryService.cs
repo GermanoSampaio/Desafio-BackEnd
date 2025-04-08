@@ -1,4 +1,5 @@
 ﻿
+using Amazon.Auth.AccessControlPolicy;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -8,6 +9,7 @@ using MotoService.Application.Mappers;
 using MotoService.Domain.Entities;
 using MotoService.Domain.Exceptions;
 using MotoService.Domain.Interfaces;
+using MotoService.Domain.Utils;
 using MotoService.Domain.Validators;
 
 namespace MotoService.Application.Services
@@ -27,39 +29,56 @@ namespace MotoService.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<DeliveryDTO> RegisterAsync(CreateDeliveryDTO deliveryDto)
+        public async Task<DeliveryResponseDTO> RegisterAsync(DeliveryRequestDTO deliveryDto)
         {
             await ValidateDelivery(deliveryDto);
             var delivery = _mapper.Map<Delivery>(deliveryDto);
 
+            await SaveImage(delivery);
+
             await _repository.CreateAsync(delivery);
-            return _mapper.Map<DeliveryDTO>(delivery);
+            return _mapper.Map<DeliveryResponseDTO>(delivery);
         }
-        public async Task<string> UploadCNHImageAsync(string identifier, IFormFile cnhFile)
+        public async Task<string> UploadCNHImageAsync(string identifier, string base64Image)
         {
             var delivery = await _repository.GetByIdentifierAsync(identifier) ?? throw new DeliveryNotFoundException();
+
+            delivery.SetCnhBase64String(base64Image);
 
             _logger.LogInformation("Alterando a CNH {CnhNumber}", identifier);
 
-            var ext = Path.GetExtension(cnhFile.FileName).ToLower();
-            if (ext != ".png" && ext != ".bmp")
-                throw new InvalidFileFormatException();
+            await SaveImage(delivery);
 
-            using var stream = cnhFile.OpenReadStream();
-            var fileName = $"{delivery.Identifier}_cnh{ext}";
-            var url = await _storage.UploadAsync(stream, fileName, cnhFile.ContentType);
-            delivery.SetCnhImageUrl(url);
+
             await _repository.UpdateCNHImageUrlAsync(delivery);
+
             return delivery.CnhImageURL;
         }
-        public async Task<DeliveryDTO?> GetByIdAsync(string identifier)
+
+        private async Task SaveImage(Delivery delivery)
+        {
+            var imageBytes = Convert.FromBase64String(delivery.CnhBase64String);
+
+            var imageInfo = FileHelper.DetectImageInfo(imageBytes)
+                           ?? throw new InvalidFileFormatException();
+
+            var fileName = $"{delivery.Identifier}_cnh{imageInfo.Extension}";
+
+           var memoryStream = new MemoryStream(imageBytes);
+            var url = _storage.UploadAsync(memoryStream, fileName, imageInfo.ContentType);
+                
+            delivery.SetCnhImageUrl(url.Result);
+
+        }
+      
+        public async Task<DeliveryResponseDTO?> GetByIdAsync(string identifier)
         {
             var delivery = await _repository.GetByIdentifierAsync(identifier) ?? throw new DeliveryNotFoundException();
 
-            return _mapper.Map<DeliveryDTO>(delivery);
+            return _mapper.Map<DeliveryResponseDTO>(delivery);
         }
 
-        private async Task ValidateDelivery(CreateDeliveryDTO dto)
+        private async Task ValidateDelivery(DeliveryRequestDTO dto)
         {
             if (!CnhTypeValidator.IsValid(dto.CnhType))
                 throw new InvalidCnhTypeException();

@@ -2,7 +2,7 @@
 
 namespace MotoService.Application.DTOs
 {
-    public class LicensePlateDTO
+    public class LicensePlateRequestDTO
     {
         [JsonPropertyName("placa")]
         public string LicensePlate { get; set; } = String.Empty;

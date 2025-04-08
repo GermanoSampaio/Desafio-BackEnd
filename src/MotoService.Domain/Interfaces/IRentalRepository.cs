@@ -6,6 +6,7 @@ namespace MotoService.Domain.Interfaces
     {
         Task<Rental?> GetRentalByIdAsync(string identifier);
         Task<Rental> CreateRentalAsync(Rental rentalDto);
-        Task UpdateRentalAsync(Rental rentalDto);
+        Task UpdateRentalAsync(Rental rentalDto, DateTime newTerminalDate);
+        Task<List<Rental>> GetRentalsByMotoIdAsync(string motorcycleId);
     }
 }

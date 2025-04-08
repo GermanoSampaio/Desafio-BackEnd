@@ -8,11 +8,13 @@ namespace MotoService.Application.Mappers
     {
         public RentalProfile()
         {
-            CreateMap<CreateRentalDTO, Rental>()
+            CreateMap<RentalRequestDTO, Rental>()
                 .ForMember(dest => dest.ExpectedTerminalDate, opt => opt.Ignore())
                 .ForMember(dest => dest.RentalPlan, opt => opt.Ignore())
                 .ForMember(dest => dest.DailyRate, opt => opt.Ignore());
-            CreateMap<Rental, RentalDTO>();
+
+            CreateMap<Rental, RentalResponseDTO>()
+                .ForMember(dest => dest.RentalPlan, opt => opt.MapFrom(src => src.RentalPlan.Days));
         }
     }
 }

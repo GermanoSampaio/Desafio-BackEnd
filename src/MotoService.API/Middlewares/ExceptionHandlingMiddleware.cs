@@ -36,10 +36,28 @@ namespace MotoService.API.Middlewares
 
             switch (exception)
             {
-                case DeliveryNotFoundException notFoundEx:
+                case RentalNotFoundException rentalNotFound:
                     statusCode = HttpStatusCode.NotFound;
-                    message = notFoundEx.Message;
-                    _logger.LogWarning(notFoundEx, "Entidade não encontrada.");
+                    message = rentalNotFound.Message;
+                    _logger.LogWarning(rentalNotFound, "Entidade não encontrada.");
+                    break;
+
+                case RentalPlanNotFoundException rentalNotFound:
+                    statusCode = HttpStatusCode.NotFound;
+                    message = rentalNotFound.Message;
+                    _logger.LogWarning(rentalNotFound, "Entidade não encontrada.");
+                    break;
+
+                case MotorcycleNotFoundException motorcycleNotFound:
+                    statusCode = HttpStatusCode.NotFound;
+                    message = motorcycleNotFound.Message;
+                    _logger.LogWarning(motorcycleNotFound, "Entidade não encontrada.");
+                    break;
+
+                case DeliveryNotFoundException deliveryNotFound:
+                    statusCode = HttpStatusCode.NotFound;
+                    message = deliveryNotFound.Message;
+                    _logger.LogWarning(deliveryNotFound, "Entidade não encontrada.");
                     break;
 
                 case DomainException domainEx:
@@ -48,7 +66,7 @@ namespace MotoService.API.Middlewares
                     errors = domainEx.Details;
                     _logger.LogWarning(domainEx, "Erro de domínio.");
                     break;
-
+           
                 default:
                     statusCode = HttpStatusCode.InternalServerError;
                     message = "Erro interno no servidor.";

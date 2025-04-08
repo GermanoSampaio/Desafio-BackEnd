@@ -5,8 +5,8 @@ namespace MotoService.Application.Interfaces
 {
     public interface IDeliveryService
     {
-        Task<DeliveryDTO> RegisterAsync(CreateDeliveryDTO deliveryDto);
-        Task<string> UploadCNHImageAsync(string identifier, IFormFile cnhFile);
-        Task<DeliveryDTO?> GetByIdAsync(string identifier);
+        Task<DeliveryResponseDTO> RegisterAsync(DeliveryRequestDTO deliveryDto);
+        Task<string> UploadCNHImageAsync(string identifier, string base64Image);
+        Task<DeliveryResponseDTO?> GetByIdAsync(string identifier);
     }
 }

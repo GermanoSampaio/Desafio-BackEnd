@@ -10,20 +10,17 @@ namespace MotoService.Infrastructure.Persistence
     {
         private readonly IMongoCollection<Motorcycle> _motorcycles;
         private readonly ILogger<MotorcycleRepository> _logger;
-        private readonly ISequenceGenerator _sequenceGenerator;
 
-        public MotorcycleRepository(MongoDbContext context, ILogger<MotorcycleRepository> logger, ISequenceGenerator sequenceGenerator)
+        public MotorcycleRepository(MongoDbContext context, ILogger<MotorcycleRepository> logger)
         {
             _logger = logger;
             _motorcycles = context.Motorcycles;
-            _sequenceGenerator = sequenceGenerator;
 
             var indexKeys = Builders<Motorcycle>.IndexKeys.Ascending(m => m.LicensePlate);
             var indexOptions = new CreateIndexOptions { Unique = true };
             var indexModel = new CreateIndexModel<Motorcycle>(indexKeys, indexOptions);
 
             _motorcycles.Indexes.CreateOne(indexModel);
-            _sequenceGenerator = sequenceGenerator;
         }
 
         public async Task<List<Motorcycle>> GetAllAsync()
@@ -36,20 +33,17 @@ namespace MotoService.Infrastructure.Persistence
             return await _motorcycles.Find(m => m.Identifier == id).FirstOrDefaultAsync();
         }
 
-        public async Task<string> CreateAsync(Motorcycle motorcycle)
+        public async Task<bool> CreateAsync(Motorcycle motorcycle)
         {
             try
             {
-                long next = await _sequenceGenerator.GetNextSequenceValueAsync("moto");
-                motorcycle.Identifier = $"moto{next:D6}";
-
                 await _motorcycles.InsertOneAsync(motorcycle);
-                return motorcycle.Identifier;
+                return true;
             }
             catch (MongoWriteException ex) when (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
             {
                 _logger.LogError(ex, "Erro ao inserir entregador: {Message}", ex.Message);
-                return String.Empty;
+                return false;
             }
         }
 

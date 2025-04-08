@@ -4,6 +4,6 @@ namespace MotoService.Domain.Repositories
 {
     public interface ISequenceGenerator
     {
-        Task<long> GetNextSequenceValueAsync(string key);
+        Task<string> GetNextSequenceValueAsync(string key);
     }
 }

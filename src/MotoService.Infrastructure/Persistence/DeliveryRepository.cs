@@ -12,12 +12,10 @@ namespace MotoService.Infrastructure.Persistence
         private readonly ILogger<DeliveryRepository> _logger;
         private readonly IMongoClient _mongoClient;
         private readonly IMongoCollection<Delivery> _collection;
-        private readonly ISequenceGenerator _sequenceGenerator;
-        public DeliveryRepository(ILogger<DeliveryRepository> logger, MongoDbContext context, ISequenceGenerator sequenceGenerator)
+        public DeliveryRepository(ILogger<DeliveryRepository> logger, MongoDbContext context)
         {
             _logger = logger;
             _collection = context.Delivery;
-            _sequenceGenerator = sequenceGenerator;
             _mongoClient = context.Client;
         }
 
@@ -26,8 +24,6 @@ namespace MotoService.Infrastructure.Persistence
             using var session = await _mongoClient.StartSessionAsync();
             try
             {
-                long next = await _sequenceGenerator.GetNextSequenceValueAsync("delivery");
-                delivery.SetIdentifier($"delivery{next:D6}");
                 await _collection.InsertOneAsync(delivery);
             }
             catch (MongoWriteException ex) when (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
