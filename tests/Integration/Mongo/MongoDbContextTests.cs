@@ -19,11 +19,11 @@ namespace MotoService.Tests.Integration.Mongo
             _context = new MongoDbContext(configuration, settings);
         }
 
-        //[Fact]
-        //public void ShouldConnectToDatabase()
-        //{
-        //    var databaseName = _context.Client.GetDatabase("MotoServiceDb").DatabaseNamespace.DatabaseName;
-        //    Assert.Equal("MotoServiceDb", databaseName);
-        //}
+        [Fact]
+        public void ShouldConnectToDatabase()
+        {
+            var databaseName = _context.Client.GetDatabase("MotoServiceDb").DatabaseNamespace.DatabaseName;
+            Assert.Equal("MotoServiceDb", databaseName);
+        }
     }
 }

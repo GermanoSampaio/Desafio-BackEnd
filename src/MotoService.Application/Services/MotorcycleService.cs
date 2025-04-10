@@ -76,7 +76,7 @@ namespace MotoService.Application.Services
                 _logger.LogInformation("Moto cadastrada com sucesso. Publicando evento...");
 
                 await _publisher.PublishMessageAsync(registeredEvent);
-                _logger.LogInformation("Publicar notificação de moto cadastrada.");
+               
             }
             else
             {

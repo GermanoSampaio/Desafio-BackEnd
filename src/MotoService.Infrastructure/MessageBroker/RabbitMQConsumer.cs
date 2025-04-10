@@ -44,9 +44,10 @@ namespace MotoService.Infrastructure.MessageBroker
 
                     if (motorcycleEvent?.Year == 2024)
                     {
+                        await _repository.StoreNotificationAsync(motorcycleEvent);
+
                         _logger.LogInformation("Moto 2024 cadastrada: ID {MotorcycleId}, Modelo: {Model}, Placa: {LicensePlate}, Ano:{Year}",
                         motorcycleEvent.Identifier, motorcycleEvent.Model, motorcycleEvent.LicensePlate, motorcycleEvent.Year);
-                        await _repository.StoreNotificationAsync(motorcycleEvent);
                     }
 
                     await channel.BasicAckAsync(ea.DeliveryTag, multiple: false);
