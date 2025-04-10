@@ -4,9 +4,7 @@ using Mongo2Go;
 using MongoDB.Driver;
 using Moq;
 using MotoService.Domain.Entities;
-using MotoService.Domain.Enums;
 using MotoService.Domain.Interfaces;
-using MotoService.Domain.Repositories;
 using MotoService.Infrastructure.Persistence;
 using MotoService.Tests.Integration.Factories;
 

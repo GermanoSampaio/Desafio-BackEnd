@@ -26,6 +26,7 @@ namespace MotoService.Tests.Integration.Mongo
             var loggerMock = new Mock<ILogger<MotorcycleNotificationRepository>>();
             _repository = new MotorcycleNotificationRepository(mongoDbContext);
 
+            _collection = mongoDbContext.GetCollection<MotorcycleRegisteredEvent>("motorcycle_notifications");
         }
 
         public Task DisposeAsync()

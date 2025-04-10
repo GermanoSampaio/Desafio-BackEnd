@@ -18,6 +18,12 @@ namespace MotoService.Infrastructure.Persistence.Contexts
             _client = new MongoClient(_settings.ConnectionString);
             _database = _client.GetDatabase(_settings.DatabaseName);
         }
+
+        public IMongoCollection<T> GetCollection<T>(string collectionName)
+        {
+            return _database.GetCollection<T>(collectionName);
+        }
+
         public IMongoClient Client => _client;
 
         public IMongoCollection<Motorcycle> Motorcycles => _database.GetCollection<Motorcycle>("motorcycles");
