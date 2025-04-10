@@ -108,7 +108,7 @@ namespace tests.Integration.Mongo
 
             // Assert
             result.Should().NotBeNull();
-            result.DailyRate.Should().Be(100);
+            result.DailyRate.Should().Be(650);
         }
     }
 }

@@ -115,6 +115,15 @@ namespace MotoService.Tests.Unit.ServiceTests
         [Fact]
         public async Task DeleteAsync_ShouldDeleteMotorcycle_WhenExists()
         {
+            // Arrange
+            _mockRentalRepository
+                .Setup(x => x.GetRentalsByMotoIdAsync("moto001"))
+                .ReturnsAsync(new List<Rental>());
+
+            _mockMotorcycleRepository
+                .Setup(x => x.DeleteAsync("moto001"))
+                .Returns(Task.CompletedTask);
+
             // Act
             await _motorcycleService.DeleteAsync("moto001");
 
