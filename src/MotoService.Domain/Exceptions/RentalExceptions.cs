@@ -24,15 +24,28 @@
         public RentalNotFoundException() : base(ErrorMessages.RentalNotFound) { }
     }
 
-    public class MotorcycleUnavailableException : DomainException
-    {
-        public MotorcycleUnavailableException(string motorcycleId)
-            : base($"Moto {motorcycleId} está indisponível para o período informado.") { }
-    }
+   
     public class RentalStartDateInvalidException : DomainException
     {
         public RentalStartDateInvalidException()
              : base(ErrorMessages.RentalStartDateInvalid) { }
     }
-        
+
+    public class RentalEndDateInvalidException : DomainException
+    {
+        public RentalEndDateInvalidException()
+             : base(ErrorMessages.RentalEndDateInvalid) { }
+    }
+    public class RentalEndDateMustBeFutureInvalidException : DomainException
+    {
+        public RentalEndDateMustBeFutureInvalidException()
+             : base(ErrorMessages.RentalEndDateMustBeFuture) { }
+    }
+
+    public class ActiveRentalExistsException : DomainException
+    {
+        public ActiveRentalExistsException(string motorcycleId)
+            : base($"Não é possível remover a moto (ID: {motorcycleId}) porque existe uma locação cadastrada.") { }
+    }
+
 }

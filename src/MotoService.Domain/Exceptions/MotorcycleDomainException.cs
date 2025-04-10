@@ -28,5 +28,10 @@
     {
         public MotorcycleNotFoundException() : base(ErrorMessages.MotoNotFound) { }
     }
+    public class MotorcycleUnavailableException : DomainException
+    {
+        public MotorcycleUnavailableException(string motorcycleId)
+            : base($"Moto {motorcycleId} está indisponível para o período informado.") { }
+    }
 
 }

@@ -48,8 +48,6 @@ namespace MotoService.Application.Services
 
             await _rentalDomainService.ValidateRentalCreationAsync(rentalDto.MotorcycleId, delivery.CnhType, rentalDto.StartDate, rentalDto.TerminalDate);
 
-
-
             var rental = _mapper.Map<Rental>(rentalDto);
             
             var rentalCreated = await _rentalRepository.CreateRentalAsync(rental);

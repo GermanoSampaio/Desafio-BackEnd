@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using MotoService.Application.DTOs;
 using MotoService.Application.Interfaces;
 using MotoService.Domain.Entities;
+using MotoService.Domain.Exceptions;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace MotoService.API.Controllers
@@ -70,10 +71,16 @@ namespace MotoService.API.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAsync(string id)
         {
-            var motorcycle = await _motorcycleService.GetByIdAsync(id);
-           
-            await _motorcycleService.DeleteAsync(id);
-            return Ok();
+            try
+            {
+                await _motorcycleService.DeleteAsync(id);
+                return Ok();
+            }
+            catch (DomainException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+
         }
 
       

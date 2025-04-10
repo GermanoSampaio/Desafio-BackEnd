@@ -2,7 +2,7 @@ services:
   # MongoDB com Replica Set
   mongodb:
     image: mongo:7.0
-    container_name: mongodb-rs
+    container_name: mongodb
     ports:
       - 27017:27017
     volumes:
@@ -18,7 +18,7 @@ services:
 
   # RabbitMQ com UI de gerenciamento
   rabbitmq:
-    image: rabbitmq:3-management
+    image: rabbitmq:management
     container_name: rabbitmq
     ports:
       - 5672:5672        # Porta para apps .NET
@@ -40,16 +40,33 @@ services:
     container_name: minio
     command: server /data --console-address ":9001"
     ports:
-      - 9100:9000        # API S3
-      - 9003:9001        # Console Web
+      - 9000:9000        # API S3
+      - 9001:9001        # Console Web
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     volumes:
-      - minio-data:/data
+      - ./data:/data
     networks:
       - backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   
+  minio-create-bucket:
+    image: minio/mc
+    container_name: minio-create-bucket
+    depends_on:
+       minio:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "/init/entrypoint.sh"]
+    volumes:
+        - ./init/entrypoint.sh:/init/entrypoint.sh:ro
+    networks:
+        - backend
+
   api:
     container_name: motoservice-api
     build:
@@ -64,13 +81,48 @@ services:
         condition: service_healthy
       minio:
         condition: service_started
+      minio-create-bucket:
+        condition: service_completed_successfully
     networks:
       - backend
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      MongoDbSettings__ConnectionString: "mongodb://mongodb:27017"
+      # RabbitMQ
       RabbitMqSettings__HostName: "rabbitmq"
+      RabbitMqSettings__UserName: "guest"
+      RabbitMqSettings__Password: "guest"
+      RabbitMqSettings__Exchange: "ex-moto"
+      RabbitMqSettings__Queue: "q-moto-notification"
+      RabbitMqSettings__RoutingKey: "moto-created"
+
+      # MongoDB
+      MongoDbSettings__ConnectionString: "mongodb://mongodb:27017"
+      MongoDbSettings__DatabaseName: "service_motos"
+
+      # AWS (MinIO)
+      AWSSettings__BucketName: "moto-service"
+      AWSSettings__AccessKey: "minioadmin"
+      AWSSettings__SecretKey: "minioadmin"
       AWSSettings__ServiceURL: "http://minio:9000"
+      AWSSettings__UseHttp: "true"
+      AWSSettings__ForcePathStyle: "true"
+      AWSSettings__EndpointUrl: "http://minio:9000"
+
+      # Logging
+      Logging__LogLevel__Default: "Information"
+      Logging__LogLevel__Microsoft_AspNetCore: "Warning"
+      File__Path: "Logs/log-{Date}.txt"
+      File__RollingInterval: "Day"
+
+      # Rate Limiting
+      IpRateLimiting__EnableEndpointRateLimiting: "true"
+      IpRateLimiting__StackBlockedRequests: "false"
+      IpRateLimiting__RealIpHeader: "X-Real-IP"
+      IpRateLimiting__ClientIdHeader: "X-ClientId"
+      IpRateLimiting__HttpStatusCode: "429"
+      IpRateLimiting__GeneralRules__0__Endpoint: "*"
+      IpRateLimiting__GeneralRules__0__Period: "1m"
+      IpRateLimiting__GeneralRules__0__Limit: "10000"
 
 volumes:
   mongo-data:

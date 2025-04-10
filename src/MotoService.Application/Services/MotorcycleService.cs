@@ -4,6 +4,7 @@ using MotoService.Application.DTOs;
 using MotoService.Application.Interfaces;
 using MotoService.Domain.Entities;
 using MotoService.Domain.Exceptions;
+using MotoService.Domain.Interfaces;
 using MotoService.Domain.Repositories;
 using MotoService.Infrastructure.MessageBroker.Interfaces;
 
@@ -12,13 +13,15 @@ namespace MotoService.Application.Services
     public class MotorcycleService : IMotorcycleService
     {
         private readonly IMotorcycleRepository _motorcycleRepository;
+        private readonly IRentalRepository _rentalRepository;
         private readonly IRabbitMQPublisher _publisher;
         private readonly ILogger<MotorcycleService> _logger;
         private readonly IMapper _mapper;
 
-        public MotorcycleService(IMotorcycleRepository motorcycleRepository, IRabbitMQPublisher publisher, ILogger<MotorcycleService> logger, IMapper mapper)
+        public MotorcycleService(IMotorcycleRepository motorcycleRepository, IRentalRepository rentalRepository, IRabbitMQPublisher publisher, ILogger<MotorcycleService> logger, IMapper mapper)
         {
             _motorcycleRepository = motorcycleRepository;
+            _rentalRepository = rentalRepository;
             _publisher = publisher;
             _logger = logger;
             _mapper = mapper;
@@ -47,6 +50,11 @@ namespace MotoService.Application.Services
 
         public async Task DeleteAsync(string identifier)
         {
+            var hasRental = await _rentalRepository.GetRentalsByMotoIdAsync(identifier);
+            
+            if(hasRental.Any())
+                throw new ActiveRentalExistsException(identifier);
+
             await _motorcycleRepository.DeleteAsync(identifier);
         }
 

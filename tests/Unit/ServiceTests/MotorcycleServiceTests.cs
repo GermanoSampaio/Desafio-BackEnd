@@ -7,6 +7,7 @@ using MotoService.Application.Mappers;
 using MotoService.Application.Services;
 using MotoService.Domain.Entities;
 using MotoService.Domain.Exceptions;
+using MotoService.Domain.Interfaces;
 using MotoService.Domain.Repositories;
 using MotoService.Infrastructure.MessageBroker.Interfaces;
 using Xunit;
@@ -16,6 +17,7 @@ namespace MotoService.Tests.Unit.ServiceTests
     public class MotorcycleServiceTests
     {
         private readonly Mock<IMotorcycleRepository> _mockMotorcycleRepository;
+        private readonly Mock<IRentalRepository> _mockRentalRepository;
         private readonly Mock<IRabbitMQPublisher> _mockPublisher;
         private readonly Mock<ILogger<MotorcycleService>> _mockLogger;
         private readonly IMapper _mapper;
@@ -24,11 +26,12 @@ namespace MotoService.Tests.Unit.ServiceTests
         public MotorcycleServiceTests()
         {
             _mockMotorcycleRepository = new Mock<IMotorcycleRepository>();
+            _mockRentalRepository = new Mock<IRentalRepository>();
             _mockPublisher = new Mock<IRabbitMQPublisher>();
             _mockLogger = new Mock<ILogger<MotorcycleService>>();
             var config = new MapperConfiguration(cfg => cfg.AddProfile<MotorcycleProfile>());
             _mapper = config.CreateMapper();
-            _motorcycleService = new MotorcycleService(_mockMotorcycleRepository.Object, _mockPublisher.Object, _mockLogger.Object, _mapper);
+            _motorcycleService = new MotorcycleService(_mockMotorcycleRepository.Object, _mockRentalRepository.Object, _mockPublisher.Object, _mockLogger.Object, _mapper);
         }
 
         [Fact]

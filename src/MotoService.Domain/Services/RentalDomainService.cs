@@ -26,6 +26,12 @@ namespace MotoService.Domain.Services
             if (startDate.Date <= DateTime.UtcNow.Date)
                 throw new RentalStartDateInvalidException();
 
+            if (endDate.Date <= DateTime.UtcNow.Date)
+                throw new RentalEndDateMustBeFutureInvalidException();
+
+            if (endDate.Date > startDate.Date.AddDays(-7))
+                throw new RentalEndDateInvalidException();
+
             if (!cnhType.Contains("A"))
                throw new InvalidCnhTypeException(cnhType);
 

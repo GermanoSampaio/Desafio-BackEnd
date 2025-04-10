@@ -81,17 +81,18 @@ namespace MotoService.Infrastructure.Persistence
 
         private async Task<Rental?> ConfigureRentalPlanAsync(Rental rental)
         {
-            var rentalDays = (rental.TerminalDate - rental.StartDate).Days;
-            var plan = await _rentalPlanRepository.GetByDaysAsync(rentalDays);
+            var plan = await _rentalPlanRepository.GetByDaysAsync(rental.RentalPlan.Days);
 
             if (plan is null)
             {
-                _logger.LogWarning("Plano de locação não encontrado para {rentalDays} dias.", rentalDays);
+                _logger.LogWarning("Plano de locação não encontrado para {rentalDays} dias.", rental.RentalPlan.Days);
                 throw new RentalPlanNotFoundException(); 
             }
 
+            var totalRental = RentalPriceCalculator.CalculateTotal(rental, rental.TerminalDate);
+
             rental.SetRentalPlan(plan);
-            rental.SetDailyRate(plan.DailyRate);
+            rental.SetDailyRate(totalRental);
             rental.SetExpectedTerminalDate(rental.StartDate.AddDays(plan.Days));
 
             return rental;
@@ -103,6 +104,7 @@ namespace MotoService.Infrastructure.Persistence
                 .Find(r => r.MotorcycleId == motorcycleId)
                 .ToListAsync();
         }
+
 
     }
 }

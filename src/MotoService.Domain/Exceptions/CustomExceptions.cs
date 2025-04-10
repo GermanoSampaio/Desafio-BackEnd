@@ -26,6 +26,10 @@
     {
         public InvalidFileFormatException() : base(ErrorMessages.InvalidFileFormat) { }
     }
-
+    public class BucketNotFoundException : Exception
+    {
+        public BucketNotFoundException(string bucketName)
+            : base($"Bucket '{bucketName}' não encontrado.") { }
+    }
 
 }
