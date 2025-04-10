@@ -80,7 +80,12 @@ namespace MotoService.Application.Services
             }
             else
             {
+                var motorcycleByPlate = await _motorcycleRepository.GetByLicensePlateAsync(motorcycleDto.LicensePlate) ?? throw new MotorcycleErrorException();
+
+                if (motorcycleByPlate!= null)
+                    throw new MotorcycleDuplicateRequiredException(motorcycleByPlate.LicensePlate);
                 _logger.LogError("Erro ao tentar cadastrar motocicleta.");
+
             }
 
             return motorcycle.Identifier;

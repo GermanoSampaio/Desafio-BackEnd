@@ -26,6 +26,7 @@ namespace MotoService.Domain.Exceptions
         public const string RentalStartDateInvalid = "A data de início da locação deve ser posterior à data atual.";
         public const string RentalEndDateInvalid = "A data de término da locação deve ser pelo menos 7 dias após a data atual.";
         public const string RentalEndDateMustBeFuture = "A data de término deve ser futura.";
-        
+        public const string MotorcycleErrorRequired = "Erro ao tentar cadastrar motocicleta.";
+
     }
 }

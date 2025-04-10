@@ -34,4 +34,13 @@
             : base($"Moto {motorcycleId} está indisponível para o período informado.") { }
     }
 
+    public class MotorcycleErrorException : DomainException
+    {
+        public MotorcycleErrorException() : base(ErrorMessages.MotorcycleErrorRequired) { }
+    }
+    public class MotorcycleDuplicateRequiredException : DomainException
+    {
+        public MotorcycleDuplicateRequiredException(string licensePlate) : base($"Moto de placa {licensePlate} já cadastrada!") { }
+    }
+    
 }

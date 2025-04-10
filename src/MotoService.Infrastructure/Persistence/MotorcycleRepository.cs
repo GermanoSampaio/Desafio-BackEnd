@@ -33,6 +33,11 @@ namespace MotoService.Infrastructure.Persistence
             return await _motorcycles.Find(m => m.Identifier == id).FirstOrDefaultAsync();
         }
 
+        public async Task<Motorcycle?> GetByLicensePlateAsync(string licensePlate)
+        {
+            return await _motorcycles.Find(m => m.LicensePlate == licensePlate).FirstOrDefaultAsync();
+        }
+
         public async Task<bool> CreateAsync(Motorcycle motorcycle)
         {
             try
